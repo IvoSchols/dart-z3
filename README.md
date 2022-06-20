@@ -1,2 +1,1 @@
-# dart-z3
-A not so idiomatic generated z3 binding
+Z3 (Version 4.8.17) bindings for Dart, generated with ffigen
