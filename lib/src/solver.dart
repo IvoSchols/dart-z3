@@ -1,21 +1,31 @@
-import 'object.dart';
-
 import 'generated_bindings.dart';
 
+import 'context.dart';
+import 'expr.dart';
+import 'object.dart';
+
+// ignore: camel_case_types
 enum check_result { unsat, sat, unknown }
 
 class Solver extends Object {
   late Z3_solver _solver;
 
-  Solver(NativeZ3Library lookup, Z3_context context) : super(lookup, context) {
-    _solver = lookup.Z3_mk_solver(context);
+  Solver(NativeZ3Library lookup, Context context) : super(lookup, context) {
+    _solver = lookup.Z3_mk_solver(context.native);
   }
 
-  void add(Z3_ast ast) {
-    lookup.Z3_add_const_interp(c, m, f, a)
-    lookup.Z3_solver_assert(_solver, ast);
+  void addExpr(Expr e) {
+    assert(e.is_bool());
+    lookup.Z3_solver_assert(context, _solver, e);
+    check_error(context);
   }
 
+  void addExprVector(List<Expr> ev) {
+    //TODO: check context
+    for (var e in ev) {
+      addExpr(e);
+    }
+  }
 
   check_result check() {
     //TODO: add proper enum for return value
@@ -29,5 +39,4 @@ class Solver extends Object {
     }
     throw Exception("Unknown check result");
   }
-  
 }

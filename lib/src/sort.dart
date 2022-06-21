@@ -1,5 +1,8 @@
 import 'generated_bindings.dart';
 
+import 'ast.dart';
+import 'context.dart';
+
 enum Z3_sort_kind {
   Z3_UNINTERPRETED_SORT,
   Z3_BOOL_SORT,
@@ -19,12 +22,14 @@ enum Z3_sort_kind {
 }
 
 //TODO finish recursive sort implementation
-class Sort {
-  late final NativeZ3Library _lookup;
-  late final Z3_context _context;
+class Sort extends Ast {
+  late Z3_sort native;
 
-  Sort(NativeZ3Library lookup, Z3_context context) {
-    _lookup = lookup;
-    _context = context;
+  Sort.fromAst(NativeZ3Library lookup, Context context, Z3_ast ast)
+      : super(lookup, context, ast);
+
+  Sort.fromNative(NativeZ3Library lookup, Context context, Z3_sort sort)
+      : super(lookup, context) {
+    native = sort;
   }
 }
