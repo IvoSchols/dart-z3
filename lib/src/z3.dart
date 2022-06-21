@@ -4,8 +4,14 @@ import 'dart:ffi';
 
 import 'generated_bindings.dart';
 
-import 'context.dart';
 import 'solver.dart';
+
+part 'ast.dart'
+part 'context.dart';
+part 'int_symbol.dart';
+part 'sort.dart';
+part 'symbol.dart';
+part 'Z3Object.dart';
 
 class Z3 {
   late final NativeZ3Library _lookup;
