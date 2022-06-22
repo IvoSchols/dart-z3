@@ -136,30 +136,19 @@ void tieShirt() {
   var ctx = ast.context;
   s = native.Z3_mk_solver(ctx);
 
-  Z3_sort tx = native.Z3_mk_bool_sort(ctx);
-  Z3_symbol ttx = native.Z3_mk_string_symbol(ctx, "x".toNativeUtf8().cast());
-  x = native.Z3_mk_const(ctx, ttx, tx);
+  x = ast.mkBoolVar("x");
 
-  Z3_sort ty = native.Z3_mk_bool_sort(ctx);
-  Z3_symbol tty = native.Z3_mk_string_symbol(ctx, "y".toNativeUtf8().cast());
-  y = native.Z3_mk_const(ctx, tty, ty);
+  y = ast.mkBoolVar("y");
 
-  var args = <Z3_ast>[];
-  args.add(x);
-  args.add(y);
-  x_or_y = native.Z3_mk_or(ctx, 2, astListToArray(args));
+  x_or_y = ast.or([x, y]);
 
-  var not_x = native.Z3_mk_not(ctx, x);
+  var not_x = ast.not(x);
 
-  args[0] = not_x;
+  nx_or_y = ast.or([not_x, y]);
 
-  nx_or_y = native.Z3_mk_or(ctx, 2, astListToArray(args));
+  var not_y = ast.not(y);
 
-  var not_y = native.Z3_mk_not(ctx, y);
-
-  args[1] = not_y;
-
-  nx_or_ny = native.Z3_mk_or(ctx, 2, astListToArray(args));
+  nx_or_ny = ast.or([not_x, not_y]);
 
   native.Z3_solver_assert(ctx, s, x_or_y);
   native.Z3_solver_assert(ctx, s, nx_or_y);
@@ -170,12 +159,4 @@ void tieShirt() {
 
   delSolver(native, ctx, s);
   native.Z3_del_context(ctx);
-}
-
-Pointer<Z3_ast> astListToArray(List<Z3_ast> list) {
-  final ptr = calloc.allocate<Z3_ast>(sizeOf<Pointer>() * list.length);
-  for (var i = 0; i < list.length; i++) {
-    ptr.elementAt(i).value = list[i];
-  }
-  return ptr;
 }
