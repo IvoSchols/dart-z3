@@ -1,6 +1,7 @@
 library z3;
 
 import 'dart:ffi';
+import 'package:dart_z3/dart_z3.dart';
 import 'package:ffi/ffi.dart';
 
 import 'generated_bindings.dart';
@@ -8,6 +9,7 @@ import 'generated_bindings.dart';
 // import 'context.dart';
 // import 'solver.dart';
 part 'ast.dart';
+part 'exceptions.dart';
 
 class Z3 {
   late final NativeZ3Library _native;

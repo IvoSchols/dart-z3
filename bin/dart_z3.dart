@@ -31,17 +31,13 @@ void deMorgan() {
 
   var not_x = ast.not(x);
   var not_y = ast.not(y);
-  var args = <Z3_ast>[];
-  args.add(not_x);
-  args.add(not_y);
 
   var x_and_y = ast.and([not_x, not_y]);
-  var ls = native.Z3_mk_not(context, x_and_y);
-  args[0] = x;
-  args[1] = y;
-  var rs = native.Z3_mk_or(context, 2, astListToArray(args));
-  var conjecture = native.Z3_mk_iff(context, ls, rs);
-  var negated_conjecture = native.Z3_mk_not(context, conjecture);
+  var ls = ast.not(x_and_y);
+
+  var rs = ast.or([x, y]);
+  var conjecture = ast.iff(ls, rs);
+  var negated_conjecture = ast.not(conjecture);
 
   var solver = native.Z3_mk_solver(context);
   native.Z3_solver_assert(context, solver, negated_conjecture);
@@ -83,7 +79,7 @@ void findModelExample1() {
 
   y = ast.mkBoolVar("y");
 
-  x_xor_y = native.Z3_mk_xor(ctx, x, y);
+  x_xor_y = ast.xor(x, y);
 
   native.Z3_solver_assert(ctx, s, x_xor_y);
 

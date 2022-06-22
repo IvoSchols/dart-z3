@@ -4,7 +4,7 @@ class AST {
   final NativeZ3Library _native;
   late final Z3_context _context;
 
-  late final boolSort;
+  late final Z3_sort boolSort;
 
   AST(this._native) {
     Z3_config config = _native.Z3_mk_config();
@@ -20,23 +20,45 @@ class AST {
 
   // Logic
 
-  // Create an ASt node representing and [ast]
+  // Create an ASt node representing and
   // args must have at least one element
   // All types must be of type bool sort
   Z3_ast and(List<Z3_ast> args) {
-    if (args.isEmpty) throw Exception("Must have more than one element");
-    if (!args.every((ast) => _isBoolSort(ast))) {
-      throw Exception("Not bool sort");
-    }
+    if (args.isEmpty) throw EmptyListException();
+    if (!_areBoolSort(args)) throw ElementNotBoolSortException();
     return _native.Z3_mk_and(context, args.length, _astListToArray(args));
   }
 
-  // Create an AST node representing not([ast])
+  // Create an AST node representing xor
+  // x and y must be of type bool sort
+  Z3_ast iff(Z3_ast x, Z3_ast y) {
+    if (!_areBoolSort([x, y])) throw ElementNotBoolSortException();
+    return _native.Z3_mk_iff(context, x, y);
+  }
+
+  // Create an AST node representing not
   // Node must have a Boolean sort!
   Z3_ast not(Z3_ast ast) {
     //TODO: is this check needed?
-    if (!_isBoolSort(ast)) throw Exception("Not bool sort");
+    if (!_isBoolSort(ast)) throw ElementNotBoolSortException();
     return _native.Z3_mk_not(_context, ast);
+  }
+
+  // Create an ASt node representing or
+  // args must have at least one element
+  // args must be of type bool sort
+  Z3_ast or(List<Z3_ast> args) {
+    if (args.isEmpty) throw EmptyListException();
+    if (!_areBoolSort(args)) throw ElementNotBoolSortException();
+
+    return _native.Z3_mk_or(context, args.length, _astListToArray(args));
+  }
+
+  // Create an AST node representing xor
+  // x and y must be of type bool sort
+  Z3_ast xor(Z3_ast x, Z3_ast y) {
+    if (!_areBoolSort([x, y])) throw ElementNotBoolSortException();
+    return _native.Z3_mk_xor(context, x, y);
   }
 
   ///
@@ -78,6 +100,10 @@ class AST {
       ptr.elementAt(i).value = list[i];
     }
     return ptr;
+  }
+
+  bool _areBoolSort(List<Z3_ast> args) {
+    return args.every((ast) => _isBoolSort(ast));
   }
 
   bool _isBoolSort(Z3_ast ast) {
