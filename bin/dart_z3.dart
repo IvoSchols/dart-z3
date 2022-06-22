@@ -4,11 +4,13 @@ import 'package:dart_z3/src/generated_bindings.dart';
 import 'package:ffi/ffi.dart';
 
 void main() {
-  simpleExample();
+  // simpleExample();
 
-  deMorgan();
+  // deMorgan();
 
   findModelExample1();
+
+  // tieShirt();
 }
 
 void simpleExample() {
@@ -85,13 +87,9 @@ void findModelExample1() {
   var ctx = z3.context;
   s = native.Z3_mk_solver(ctx);
 
-  Z3_sort tx = native.Z3_mk_bool_sort(ctx);
-  Z3_symbol ttx = native.Z3_mk_string_symbol(ctx, "x".toNativeUtf8().cast());
-  x = native.Z3_mk_const(ctx, ttx, tx);
+  x = mkBoolVar(native, ctx, "x");
 
-  Z3_sort ty = native.Z3_mk_bool_sort(ctx);
-  Z3_symbol tty = native.Z3_mk_string_symbol(ctx, "y".toNativeUtf8().cast());
-  y = native.Z3_mk_const(ctx, tty, ty);
+  y = mkBoolVar(native, ctx, "y");
 
   x_xor_y = native.Z3_mk_xor(ctx, x, y);
 
@@ -100,8 +98,27 @@ void findModelExample1() {
   print("model for: x xor y\n");
   check(native, ctx, s, Z3_lbool.Z3_L_TRUE);
 
-  del_solver(native, ctx, s);
+  delSolver(native, ctx, s);
   native.Z3_del_context(ctx);
+}
+
+/// Make variables
+///
+///
+///  \brief Create a boolean variable using the given name.
+///
+Z3_ast mkVar(
+    NativeZ3Library native, Z3_context context, String name, Z3_sort ty) {
+  Z3_symbol s = native.Z3_mk_string_symbol(context, name.toNativeUtf8().cast());
+  return native.Z3_mk_const(context, s, ty);
+}
+
+// /**
+//    \brief Create a variable using the given name and type.
+// */
+Z3_ast mkBoolVar(NativeZ3Library native, Z3_context context, String name) {
+  Z3_sort ty = native.Z3_mk_bool_sort(context);
+  return mkVar(native, context, name, ty);
 }
 
 /**
@@ -136,6 +153,51 @@ void check(
   if (m != Pointer.fromAddress(0)) native.Z3_model_dec_ref(ctx, m);
 }
 
-void del_solver(NativeZ3Library native, Z3_context ctx, Z3_solver s) {
+void delSolver(NativeZ3Library native, Z3_context ctx, Z3_solver s) {
   native.Z3_solver_dec_ref(ctx, s);
+}
+
+void tieShirt() {
+  var z3 = Z3();
+  Z3_ast x, y, x_or_y, nx_or_y, nx_or_ny;
+  Z3_solver s;
+
+  var native = z3.native;
+  var ctx = z3.context;
+  s = native.Z3_mk_solver(ctx);
+
+  Z3_sort tx = native.Z3_mk_bool_sort(ctx);
+  Z3_symbol ttx = native.Z3_mk_string_symbol(ctx, "x".toNativeUtf8().cast());
+  x = native.Z3_mk_const(ctx, ttx, tx);
+
+  Z3_sort ty = native.Z3_mk_bool_sort(ctx);
+  Z3_symbol tty = native.Z3_mk_string_symbol(ctx, "y".toNativeUtf8().cast());
+  y = native.Z3_mk_const(ctx, tty, ty);
+
+  var args = <Z3_ast>[];
+  args.add(x);
+  args.add(y);
+  x_or_y = native.Z3_mk_or(ctx, 2, astListToArray(args));
+
+  var not_x = native.Z3_mk_not(ctx, x);
+
+  args[0] = not_x;
+
+  nx_or_y = native.Z3_mk_or(ctx, 2, astListToArray(args));
+
+  var not_y = native.Z3_mk_not(ctx, y);
+
+  args[1] = not_y;
+
+  nx_or_ny = native.Z3_mk_or(ctx, 2, astListToArray(args));
+
+  native.Z3_solver_assert(ctx, s, x_or_y);
+  native.Z3_solver_assert(ctx, s, nx_or_y);
+  native.Z3_solver_assert(ctx, s, nx_or_ny);
+
+  print("model for: x or y, not x or y, not x or not y\n");
+  check(native, ctx, s, Z3_lbool.Z3_L_TRUE);
+
+  delSolver(native, ctx, s);
+  native.Z3_del_context(ctx);
 }
