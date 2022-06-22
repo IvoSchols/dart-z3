@@ -1,28 +1,141 @@
+import 'dart:ffi';
 import 'package:dart_z3/dart_z3.dart';
+import 'package:dart_z3/src/generated_bindings.dart';
+import 'package:ffi/ffi.dart';
 
 void main() {
-  var z3 = Z3();
+  simpleExample();
 
-  var lookup = z3.lookup;
-  var context = z3.context;
+  deMorgan();
 
-  Expr Tie = context.boolConst('Tie');
-  Expr Shirt = context.boolConst('Shirt');
-
-  Solver solver = z3.solver;
-
-  solver.addExpr(Tie & Shirt);
-  print(solver.check());
-
-  // solver.add(ast);
-
-  // var boolTie = z3.Z3_mk_bool_sort(context);
-  // var boolShirt = z3.Z3_mk_bool_sort(context);
-
-  // var x = z3.Z3_mk_const(context, z3.Z3_mk_const(c, s, ty), boolTie);
-  // var y = z3.Z3_mk_const(context, "y", boolShirt);
+  findModelExample1();
 }
 
-int calculate() {
-  return 6 * 7;
+void simpleExample() {
+  var z3 = Z3();
+
+  z3.cleanUpContext();
+}
+
+void deMorgan() {
+  var z3 = Z3();
+  var context = z3.context;
+  var native = z3.native;
+  var boolSort = native.Z3_mk_bool_sort(context);
+  var symbolX = native.Z3_mk_int_symbol(context, 0);
+  var symbolY = native.Z3_mk_int_symbol(context, 1);
+
+  var x = native.Z3_mk_const(context, symbolX, boolSort);
+  var y = native.Z3_mk_const(context, symbolY, boolSort);
+
+  var not_x = native.Z3_mk_not(context, x);
+  var not_y = native.Z3_mk_not(context, y);
+  var args = <Z3_ast>[];
+  args.add(not_x);
+  args.add(not_y);
+
+  var x_and_y = native.Z3_mk_and(context, 2, astListToArray(args));
+  var ls = native.Z3_mk_not(context, x_and_y);
+  args[0] = x;
+  args[1] = y;
+  var rs = native.Z3_mk_or(context, 2, astListToArray(args));
+  var conjecture = native.Z3_mk_iff(context, ls, rs);
+  var negated_conjecture = native.Z3_mk_not(context, conjecture);
+
+  var solver = native.Z3_mk_solver(context);
+  native.Z3_solver_assert(context, solver, negated_conjecture);
+
+  switch (native.Z3_solver_check(context, solver)) {
+    case Z3_lbool.Z3_L_FALSE:
+      /* The negated conjecture was unsatisfiable, hence the conjecture is valid */
+      print("demorgen is valid");
+      break;
+    case Z3_lbool.Z3_L_UNDEF:
+      /* Check returned undef */
+      print("undef");
+      break;
+    case Z3_lbool.Z3_L_TRUE:
+      /* The negated conjecture was satisfiable, hence the conjecture is not valid */
+      print("true");
+      break;
+  }
+
+  native.Z3_solver_reset(context, solver);
+  //No solver delete?
+  z3.cleanUpContext();
+}
+
+Pointer<Z3_ast> astListToArray(List<Z3_ast> list) {
+  final ptr = calloc.allocate<Z3_ast>(sizeOf<Pointer>() * list.length);
+  for (var i = 0; i < list.length; i++) {
+    ptr.elementAt(i).value = list[i];
+  }
+  return ptr;
+}
+
+/**
+   \brief Find a model for <tt>x xor y</tt>.
+*/
+void findModelExample1() {
+  var z3 = Z3();
+  Z3_ast x, y, x_xor_y;
+  Z3_solver s;
+
+  var native = z3.native;
+  var ctx = z3.context;
+  s = native.Z3_mk_solver(ctx);
+
+  Z3_sort tx = native.Z3_mk_bool_sort(ctx);
+  Z3_symbol ttx = native.Z3_mk_string_symbol(ctx, "x".toNativeUtf8().cast());
+  x = native.Z3_mk_const(ctx, ttx, tx);
+
+  Z3_sort ty = native.Z3_mk_bool_sort(ctx);
+  Z3_symbol tty = native.Z3_mk_string_symbol(ctx, "y".toNativeUtf8().cast());
+  y = native.Z3_mk_const(ctx, tty, ty);
+
+  x_xor_y = native.Z3_mk_xor(ctx, x, y);
+
+  native.Z3_solver_assert(ctx, s, x_xor_y);
+
+  print("model for: x xor y\n");
+  check(native, ctx, s, Z3_lbool.Z3_L_TRUE);
+
+  del_solver(native, ctx, s);
+  native.Z3_del_context(ctx);
+}
+
+/**
+   \brief Check whether the logical context is satisfiable, and compare the result with the expected result.
+   If the context is satisfiable, then display the model.
+*/
+void check(
+    NativeZ3Library native, Z3_context ctx, Z3_solver s, int expected_result) {
+  Z3_model m = Pointer.fromAddress(0);
+  int result = native.Z3_solver_check(ctx, s);
+  switch (result) {
+    case Z3_lbool.Z3_L_FALSE:
+      print("unsat\n");
+      break;
+    case Z3_lbool.Z3_L_UNDEF:
+      print("unknown\n");
+      m = native.Z3_solver_get_model(ctx, s);
+      if (m != Pointer.fromAddress(0)) native.Z3_model_inc_ref(ctx, m);
+      print("potential model:\n%s\n${native.Z3_model_to_string(ctx, m)}");
+      break;
+    case Z3_lbool.Z3_L_TRUE:
+      m = native.Z3_solver_get_model(ctx, s);
+      if (m != Pointer.fromAddress(0)) native.Z3_model_inc_ref(ctx, m);
+      Pointer<Char> charPointer = native.Z3_model_to_string(ctx, m);
+      Pointer<Utf8> utfPointer = charPointer.cast();
+      print("sat\n%s\n" + utfPointer.toDartString());
+      break;
+  }
+  if (result != expected_result) {
+    throw Exception("unexpected result");
+  }
+  if (m != Pointer.fromAddress(0)) native.Z3_model_dec_ref(ctx, m);
+}
+
+void del_solver(NativeZ3Library native, Z3_context ctx, Z3_solver s) {
+  native.Z3_solver_dec_ref(ctx, s);
 }
