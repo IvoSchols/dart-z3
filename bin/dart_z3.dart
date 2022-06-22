@@ -4,39 +4,38 @@ import 'package:dart_z3/src/generated_bindings.dart';
 import 'package:ffi/ffi.dart';
 
 void main() {
-  // simpleExample();
+  simpleExample();
 
-  // deMorgan();
+  deMorgan();
 
   findModelExample1();
 
-  // tieShirt();
+  tieShirt();
 }
 
 void simpleExample() {
   var z3 = Z3();
-
-  z3.cleanUpContext();
+  AST ast = AST(z3.native);
+  ast.cleanUpContext();
 }
 
 void deMorgan() {
   var z3 = Z3();
-  var context = z3.context;
+  AST ast = AST(z3.native);
+
+  var context = ast.context;
   var native = z3.native;
-  var boolSort = native.Z3_mk_bool_sort(context);
-  var symbolX = native.Z3_mk_int_symbol(context, 0);
-  var symbolY = native.Z3_mk_int_symbol(context, 1);
 
-  var x = native.Z3_mk_const(context, symbolX, boolSort);
-  var y = native.Z3_mk_const(context, symbolY, boolSort);
+  var x = ast.mkBoolConst(false);
+  var y = ast.mkBoolConst(true);
 
-  var not_x = native.Z3_mk_not(context, x);
-  var not_y = native.Z3_mk_not(context, y);
+  var not_x = ast.not(x);
+  var not_y = ast.not(y);
   var args = <Z3_ast>[];
   args.add(not_x);
   args.add(not_y);
 
-  var x_and_y = native.Z3_mk_and(context, 2, astListToArray(args));
+  var x_and_y = ast.and([not_x, not_y]);
   var ls = native.Z3_mk_not(context, x_and_y);
   args[0] = x;
   args[1] = y;
@@ -64,15 +63,7 @@ void deMorgan() {
 
   native.Z3_solver_reset(context, solver);
   //No solver delete?
-  z3.cleanUpContext();
-}
-
-Pointer<Z3_ast> astListToArray(List<Z3_ast> list) {
-  final ptr = calloc.allocate<Z3_ast>(sizeOf<Pointer>() * list.length);
-  for (var i = 0; i < list.length; i++) {
-    ptr.elementAt(i).value = list[i];
-  }
-  return ptr;
+  ast.cleanUpContext();
 }
 
 /**
@@ -80,16 +71,17 @@ Pointer<Z3_ast> astListToArray(List<Z3_ast> list) {
 */
 void findModelExample1() {
   var z3 = Z3();
+  var ast = AST(z3.native);
   Z3_ast x, y, x_xor_y;
   Z3_solver s;
 
   var native = z3.native;
-  var ctx = z3.context;
+  var ctx = ast.context;
   s = native.Z3_mk_solver(ctx);
 
-  x = mkBoolVar(native, ctx, "x");
+  x = ast.mkBoolVar("x");
 
-  y = mkBoolVar(native, ctx, "y");
+  y = ast.mkBoolVar("y");
 
   x_xor_y = native.Z3_mk_xor(ctx, x, y);
 
@@ -100,25 +92,6 @@ void findModelExample1() {
 
   delSolver(native, ctx, s);
   native.Z3_del_context(ctx);
-}
-
-/// Make variables
-///
-///
-///  \brief Create a boolean variable using the given name.
-///
-Z3_ast mkVar(
-    NativeZ3Library native, Z3_context context, String name, Z3_sort ty) {
-  Z3_symbol s = native.Z3_mk_string_symbol(context, name.toNativeUtf8().cast());
-  return native.Z3_mk_const(context, s, ty);
-}
-
-// /**
-//    \brief Create a variable using the given name and type.
-// */
-Z3_ast mkBoolVar(NativeZ3Library native, Z3_context context, String name) {
-  Z3_sort ty = native.Z3_mk_bool_sort(context);
-  return mkVar(native, context, name, ty);
 }
 
 /**
@@ -159,11 +132,12 @@ void delSolver(NativeZ3Library native, Z3_context ctx, Z3_solver s) {
 
 void tieShirt() {
   var z3 = Z3();
+  var ast = AST(z3.native);
   Z3_ast x, y, x_or_y, nx_or_y, nx_or_ny;
   Z3_solver s;
 
   var native = z3.native;
-  var ctx = z3.context;
+  var ctx = ast.context;
   s = native.Z3_mk_solver(ctx);
 
   Z3_sort tx = native.Z3_mk_bool_sort(ctx);
@@ -200,4 +174,12 @@ void tieShirt() {
 
   delSolver(native, ctx, s);
   native.Z3_del_context(ctx);
+}
+
+Pointer<Z3_ast> astListToArray(List<Z3_ast> list) {
+  final ptr = calloc.allocate<Z3_ast>(sizeOf<Pointer>() * list.length);
+  for (var i = 0; i < list.length; i++) {
+    ptr.elementAt(i).value = list[i];
+  }
+  return ptr;
 }
