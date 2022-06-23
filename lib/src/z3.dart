@@ -10,16 +10,14 @@ import 'generated_bindings.dart';
 // import 'solver.dart';
 part 'ast.dart';
 part 'exceptions.dart';
+part 'solver.dart';
 
 class Z3 {
   late final NativeZ3Library _native;
-  Z3_solver? _solver;
 
   Z3() {
     _native = NativeZ3Library(DynamicLibrary.open('libz3.so'));
   }
-
-  void cleanUpSolver() {}
 
   NativeZ3Library get native => _native;
 

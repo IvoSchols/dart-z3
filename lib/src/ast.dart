@@ -109,4 +109,11 @@ class AST {
   bool _isBoolSort(Z3_ast ast) {
     return _native.Z3_get_sort(context, ast) == boolSort;
   }
+
+  // In this implementation (right now) context and ast are bound together.
+  // This is not the case in the C API.
+  // Please only call if you know what you are doing.
+  void delAst() {
+    _native.Z3_del_context(context);
+  }
 }
