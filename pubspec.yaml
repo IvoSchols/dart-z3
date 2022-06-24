@@ -1,5 +1,5 @@
 name: dart_z3
-description: A sample command-line application.
+description: Holds bindings to Z3, version (4.8.17)
 version: 1.0.0
 repository: https://github.com/IvoSchols/dart-z3
 
@@ -12,9 +12,3 @@ dependencies:
 dev_dependencies:
   lints: ^2.0.0
   test: ^1.16.0
-
-  name:
-    'NativeZ3Library'
-
-  description:
-    'Holds bindings to Z3'

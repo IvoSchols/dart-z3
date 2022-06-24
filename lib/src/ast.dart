@@ -18,8 +18,6 @@ class AST {
     _intSort = _native.Z3_mk_int_sort(context);
   }
 
-  // Pointer<Z3_ast> mkConstBool(Pointer<Z3_sort> sort, dynamic value) {}
-
   // Propositional Logic and Equality
 
   // Create an AST node representing and
