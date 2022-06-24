@@ -6,29 +6,15 @@ repository: https://github.com/IvoSchols/dart-z3
 environment:
   sdk: '>=2.17.3 <3.0.0'
 
-dependencies: {ffi: ^2.0.1} 
-#   path: ^1.8.0
+dependencies: 
+  ffi: ^2.0.1
 
 dev_dependencies:
   lints: ^2.0.0
   test: ^1.16.0
-  ffigen: ^6.0.1
-
-
-ffigen:
-  output: 'lib/src/generated_bindings.dart'
-
-  headers:
-    entry-points:
-      - 'third_party/z3.h'
-
 
   name:
     'NativeZ3Library'
 
   description:
     'Holds bindings to Z3'
-
-  compiler-opts:
-    - '-I/usr/lib/gcc/x86_64-pc-linux-gnu/12.1.0/include/stddef.h
-'
