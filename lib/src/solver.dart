@@ -1,5 +1,6 @@
 part of 'z3.dart';
 
+/// A Z3 solver that operates within context.
 class Solver {
   final NativeZ3Library _native;
   final Z3_context _context;
@@ -33,6 +34,7 @@ class Solver {
     throw Exception("unexpected result");
   }
 
+  //Return the model (recalculates check)
   String model() {
     Z3_model m = Pointer.fromAddress(0);
     String result = "";

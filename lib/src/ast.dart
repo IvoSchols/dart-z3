@@ -1,5 +1,6 @@
 part of 'z3.dart';
 
+/// An abstract syntax tree (AST) node that holds its own context.
 class AST {
   final NativeZ3Library _native;
   late final Z3_context _context;
@@ -20,40 +21,40 @@ class AST {
 
   // Propositional Logic and Equality
 
-  // Create an AST node representing and
-  // args must have at least one element
-  // All types must be of type bool sort
+  /// Create an AST node representing and
+  /// args must have at least one element
+  /// All types must be of type bool sort
   Z3_ast and(List<Z3_ast> args) {
     if (args.isEmpty) throw EmptyListException();
     if (!_areBoolSort(args)) throw ElementNotBoolSortException();
     return _native.Z3_mk_and(context, args.length, _astListToArray(args));
   }
 
-  // Create an AST node representing l = r
-  // l and r must be of the same sort
+  /// Create an AST node representing l = r
+  /// l and r must be of the same sort
   Z3_ast eq(Z3_ast l, Z3_ast r) {
     if (!_isSameSort(l, r)) throw SortMismatchException();
     return _native.Z3_mk_eq(context, l, r);
   }
 
-  // Create an AST node representing xor
-  // x and y must be of type bool sort
+  /// Create an AST node representing xor
+  /// x and y must be of type bool sort
   Z3_ast iff(Z3_ast x, Z3_ast y) {
     if (!_areBoolSort([x, y])) throw ElementNotBoolSortException();
     return _native.Z3_mk_iff(context, x, y);
   }
 
-  // Create an AST node representing not
-  // Node must have a Boolean sort!
+  /// Create an AST node representing not
+  /// Node must have a Boolean sort!
   Z3_ast not(Z3_ast ast) {
     //TODO: is this check needed?
     if (!_isBoolSort(ast)) throw ElementNotBoolSortException();
     return _native.Z3_mk_not(_context, ast);
   }
 
-  // Create an AST node representing or
-  // args must have at least one element
-  // args must be of type bool sort
+  /// Create an AST node representing or
+  /// args must have at least one element
+  /// args must be of type bool sort
   Z3_ast or(List<Z3_ast> args) {
     if (args.isEmpty) throw EmptyListException();
     if (!_areBoolSort(args)) throw ElementNotBoolSortException();
@@ -61,8 +62,8 @@ class AST {
     return _native.Z3_mk_or(context, args.length, _astListToArray(args));
   }
 
-  // Create an AST node representing xor
-  // x and y must be of type bool sort
+  /// Create an AST node representing xor
+  /// x and y must be of type bool sort
   Z3_ast xor(Z3_ast x, Z3_ast y) {
     if (!_areBoolSort([x, y])) throw ElementNotBoolSortException();
     return _native.Z3_mk_xor(context, x, y);
@@ -115,23 +116,23 @@ class AST {
     return _native.Z3_mk_const(_context, s, ty);
   }
 
-  // Create a boolean constant
+  /// Create a boolean constant
   Z3_ast mkBoolConst(bool boolean) {
     var symbol = _native.Z3_mk_int_symbol(context, boolean ? 1 : 0);
     return _native.Z3_mk_const(_context, symbol, _boolSort);
   }
 
-  // Create a boolean variable using the given name
+  /// Create a boolean variable using the given name
   Z3_ast mkBoolVar(String name) {
     return mkVar(name, _boolSort);
   }
 
-  // Create an integer
+  /// Create an integer
   Z3_ast mkInt(int value) {
     return _native.Z3_mk_int(_context, value, _intSort);
   }
 
-  // Create an integer variable using the given name
+  /// Create an integer variable using the given name
   Z3_ast mkIntVar(String name) {
     return mkVar(name, _intSort);
   }
@@ -150,26 +151,32 @@ class AST {
     return ptr;
   }
 
+  /// Check if all given AST are of type bool sort
   bool _areBoolSort(List<Z3_ast> args) {
     return args.every((ast) => _isBoolSort(ast));
   }
 
+  /// Check if given AST is of type bool sort
   bool _isBoolSort(Z3_ast ast) {
     return _native.Z3_get_sort(context, ast) == _boolSort;
   }
 
+  /// Check if all given AST are of type int or real sort
   bool _areIntOrRealSort(List<Z3_ast> args) {
     return args.every((ast) => _isIntOrRealSort(ast));
   }
 
+  /// Check if given AST is of type int or real sort
   bool _isIntOrRealSort(Z3_ast ast) {
     return _native.Z3_get_sort(context, ast) == _intSort;
   }
 
+  /// Check if all given AST are of same sort
   bool _areSameSort(List<Z3_ast> args) {
     return args.every((ast) => _isSameSort(args[0], ast));
   }
 
+  /// Check if given AST is of type int sort
   bool _isSameSort(Z3_ast x, Z3_ast y) {
     return _native.Z3_get_sort(context, x) == _native.Z3_get_sort(context, y);
   }

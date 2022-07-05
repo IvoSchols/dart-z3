@@ -10,9 +10,11 @@ part 'ast.dart';
 part 'exceptions.dart';
 part 'solver.dart';
 
+// Holds the pointer to all generated C-libary bindings.
 class Z3 {
   late final NativeZ3Library _native;
 
+  /// Creates a new Z3 instance.
   Z3() {
     String path = _getLibraryPath();
     try {
@@ -23,9 +25,10 @@ class Z3 {
     }
   }
 
+  /// Returns the path to the z3 library per platform, assuming it is installed.
   String _getLibraryPath() {
     String path = 'libz3.so';
-    print(Platform.isLinux);
+
     if (Platform.isLinux) {
       path = 'libz3.so';
     } else if (Platform.isMacOS) {
