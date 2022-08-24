@@ -23,13 +23,13 @@ void dogsCatsMouses() {
   var c4 = ast.eq(plus, hundred);
   s.add(c4);
 
-  var cost_dog = ast.mul([ast.mkInt(1500), dog]);
-  var cost_cat = ast.mul([ast.mkInt(100), cat]);
-  var cost_mouse = ast.mul([ast.mkInt(25), mouse]);
+  var costDog = ast.mul([ast.mkInt(1500), dog]);
+  var costCat = ast.mul([ast.mkInt(100), cat]);
+  var costMouse = ast.mul([ast.mkInt(25), mouse]);
 
-  var cost_dog_cat_mouse = ast.add([cost_dog, cost_cat, cost_mouse]);
-  var ten_thousand = ast.mkInt(10000);
-  var c5 = ast.eq(cost_dog_cat_mouse, ten_thousand);
+  var costDogCatMouse = ast.add([costDog, costCat, costMouse]);
+  var tenThousand = ast.mkInt(10000);
+  var c5 = ast.eq(costDogCatMouse, tenThousand);
   s.add(c5);
 
   print("model for: dogs, cats, and mice\n");

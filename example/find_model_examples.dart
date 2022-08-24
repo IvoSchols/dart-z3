@@ -1,12 +1,10 @@
 part of 'dart_z3_examples.dart';
 
-/**
-   \brief Find a model for <tt>x xor y</tt>.
-*/
+///   \brief Find a model for <tt>x xor y</tt>.
 void findModelExample1() {
   var z3 = Z3();
   var ast = AST(z3.native);
-  Z3_ast x, y, x_xor_y;
+  Z3_ast x, y, xXorY;
   Solver s = Solver(z3.native, ast.context);
 
   var native = z3.native;
@@ -16,9 +14,9 @@ void findModelExample1() {
 
   y = ast.mkBoolVar("y");
 
-  x_xor_y = ast.xor(x, y);
+  xXorY = ast.xor(x, y);
 
-  native.Z3_solver_assert(ctx, s.solver, x_xor_y);
+  native.Z3_solver_assert(ctx, s.solver, xXorY);
 
   print("model for: x xor y\n");
   print(s.check());
@@ -35,18 +33,18 @@ void findModelExample2() {
   var ast = AST(z3.native);
   Solver s = Solver(z3.native, ast.context);
 
-  var native = z3.native;
-  var ctx = ast.context;
+  // var native = z3.native;
+  // var ctx = ast.context;
 
-  Z3_ast x, y, one, two, y_plus_one;
+  Z3_ast x, y, one, two, yPlusOne;
   x = ast.mkIntVar("x");
   y = ast.mkIntVar("y");
   one = ast.mkInt(1);
   two = ast.mkInt(2);
 
-  y_plus_one = ast.add([y, one]);
+  yPlusOne = ast.add([y, one]);
 
-  var c1 = ast.lt(x, y_plus_one);
+  var c1 = ast.lt(x, yPlusOne);
   var c2 = ast.gt(x, two);
 
   s.add(c1);
@@ -57,8 +55,8 @@ void findModelExample2() {
   print(s.model());
 
   /* assert not(x = y) */
-  var x_eq_y = ast.eq(x, y);
-  var c3 = ast.not(x_eq_y);
+  var xEqY = ast.eq(x, y);
+  var c3 = ast.not(xEqY);
   s.add(c3);
 
   print("model for: x < y + 1, x > 2, not(x = y)\n");

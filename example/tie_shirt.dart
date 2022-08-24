@@ -3,29 +3,29 @@ part of 'dart_z3_examples.dart';
 void tieShirt() {
   var z3 = Z3();
   var ast = AST(z3.native);
-  Z3_ast x, y, x_or_y, nx_or_y, nx_or_ny;
+  Z3_ast x, y, xOrY, nxOrY, nxOrNy;
   Solver s = Solver(z3.native, ast.context);
 
-  var native = z3.native;
-  var ctx = ast.context;
+  // var native = z3.native;
+  // var ctx = ast.context;
 
   x = ast.mkBoolVar("x");
 
   y = ast.mkBoolVar("y");
 
-  x_or_y = ast.or([x, y]);
+  xOrY = ast.or([x, y]);
 
-  var not_x = ast.not(x);
+  var notX = ast.not(x);
 
-  nx_or_y = ast.or([not_x, y]);
+  nxOrY = ast.or([notX, y]);
 
-  var not_y = ast.not(y);
+  var notY = ast.not(y);
 
-  nx_or_ny = ast.or([not_x, not_y]);
+  nxOrNy = ast.or([notX, notY]);
 
-  s.add(x_or_y);
-  s.add(nx_or_y);
-  s.add(nx_or_ny);
+  s.add(xOrY);
+  s.add(nxOrY);
+  s.add(nxOrNy);
 
   print("model for: x or y, not x or y, not x or not y\n");
   print(s.check());

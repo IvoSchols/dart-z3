@@ -10,17 +10,17 @@ void deMorgan() {
   var x = ast.mkBoolConst(false);
   var y = ast.mkBoolConst(true);
 
-  var not_x = ast.not(x);
-  var not_y = ast.not(y);
+  var notX = ast.not(x);
+  var notY = ast.not(y);
 
-  var x_and_y = ast.and([not_x, not_y]);
-  var ls = ast.not(x_and_y);
+  var xAndY = ast.and([notX, notY]);
+  var ls = ast.not(xAndY);
 
   var rs = ast.or([x, y]);
   var conjecture = ast.iff(ls, rs);
-  var negated_conjecture = ast.not(conjecture);
+  var negatedConjecture = ast.not(conjecture);
   var s = Solver(native, context);
-  s.add(negated_conjecture);
+  s.add(negatedConjecture);
 
   print("model for demorgan (negated conjecture, unsat if true):");
 
