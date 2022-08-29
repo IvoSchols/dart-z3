@@ -47,7 +47,7 @@ class Solver {
       m = _native.Z3_solver_get_model(_context, _solver);
       if (m != Pointer.fromAddress(0)) _native.Z3_model_inc_ref(_context, m);
       if (checkResult == "unknown") result += "potential model:\n";
-      if (checkResult == "true") result += "sat\n";
+      // if (checkResult == "true") result += "sat\n";
       Pointer<Char> charPointer = _native.Z3_model_to_string(_context, m);
       Pointer<Utf8> utfPointer = charPointer.cast();
       result += utfPointer.toDartString();
