@@ -18,16 +18,15 @@ class Solver {
 
   //Check whether the assertions in the given solver plus the optional assumptions are consistent or not.
   String check() {
-    Z3_model m = Pointer.fromAddress(0);
     int result = _native.Z3_solver_check(_context, _solver);
 
     //TODO: is it neccesary to call model inc ref?
 
     switch (result) {
       case Z3_lbool.Z3_L_FALSE:
-        return "unsat";
+        return "false";
       case Z3_lbool.Z3_L_UNDEF:
-        return "unknown";
+        return "undef";
       case Z3_lbool.Z3_L_TRUE:
         return "true";
     }
@@ -41,12 +40,12 @@ class Solver {
 
     String checkResult = check();
 
-    if (checkResult == "unsat") {
-      return "unsat";
-    } else if (checkResult == "unknown" || checkResult == "true") {
+    if (checkResult == "false") {
+      return "false";
+    } else if (checkResult == "undef" || checkResult == "true") {
       m = _native.Z3_solver_get_model(_context, _solver);
       if (m != Pointer.fromAddress(0)) _native.Z3_model_inc_ref(_context, m);
-      if (checkResult == "unknown") result += "potential model:\n";
+      if (checkResult == "undef") result += "potential model:\n";
       // if (checkResult == "true") result += "sat\n";
       Pointer<Char> charPointer = _native.Z3_model_to_string(_context, m);
       Pointer<Utf8> utfPointer = charPointer.cast();

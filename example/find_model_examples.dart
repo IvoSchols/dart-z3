@@ -33,9 +33,6 @@ void findModelExample2() {
   var ast = AST(z3.native);
   Solver s = Solver(z3.native, ast.context);
 
-  // var native = z3.native;
-  // var ctx = ast.context;
-
   Z3_ast x, y, one, two, yPlusOne;
   x = ast.mkIntVar("x");
   y = ast.mkIntVar("y");

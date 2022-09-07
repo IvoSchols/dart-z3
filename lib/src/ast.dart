@@ -113,6 +113,7 @@ class AST {
   Z3_ast mkVar(String name, Z3_sort ty) {
     Z3_symbol s =
         _native.Z3_mk_string_symbol(_context, name.toNativeUtf8().cast());
+
     return _native.Z3_mk_const(_context, s, ty);
   }
 
