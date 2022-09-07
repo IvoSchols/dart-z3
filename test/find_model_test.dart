@@ -44,41 +44,51 @@ void main() {
     //Find a model for x < y + 1, x > 2.
     //Then, assert not (x=y), and find another model
     // SMELLY!
-    test('model expect unsat', (() {
-      Solver s = Solver(z3.native, ast.context);
+    group('x < y + 1, x > 2.', () {
+      late Z3_ast x, y;
+      setUp(() {
+        s = Solver(z3.native, ast.context);
 
-      Z3_ast x, y, one, two, yPlusOne;
-      x = ast.mkIntVar("x");
-      y = ast.mkIntVar("y");
-      one = ast.mkInt(1);
-      two = ast.mkInt(2);
+        Z3_ast one, two, yPlusOne;
+        x = ast.mkIntVar("x");
+        y = ast.mkIntVar("y");
+        one = ast.mkInt(1);
+        two = ast.mkInt(2);
 
-      yPlusOne = ast.add([y, one]);
+        yPlusOne = ast.add([y, one]);
 
-      var c1 = ast.lt(x, yPlusOne);
-      var c2 = ast.gt(x, two);
+        var c1 = ast.lt(x, yPlusOne);
+        var c2 = ast.gt(x, two);
 
-      s.add(c1);
-      s.add(c2);
+        s.add(c1);
+        s.add(c2);
+      });
 
-      ///model for: x < y + 1, x > 2"
-      expect(s.check(), "true");
+      test(' x < y + 1, x > 2 expect x=3 y=3', (() {
+        ///model for: x < y + 1, x > 2"
+        expect(s.check(), "true");
 
-      ///SMELLY!
-      expect(s.model(), allOf(contains("x -> 3"), contains("y -> 3")));
+        ///SMELLY!
+        expect(s.model(), allOf(contains("x -> 3"), contains("y -> 3")));
+      }));
 
-      /* assert not(x = y) */
-      var xEqY = ast.eq(x, y);
-      var c3 = ast.not(xEqY);
-      s.add(c3);
+      //Find a model for x < y + 1, x > 2.
+      //Then, assert not (x=y), and find another model
+      // SMELLY!
+      test(' x < y + 1, x > 2, x!=y expect x=3 y=4', (() {
+        /* assert not(x = y) */
+        var xEqY = ast.eq(x, y);
+        var c3 = ast.not(xEqY);
+        s.add(c3);
 
-      expect(s.check(), "true");
+        expect(s.check(), "true");
 
-      ///SMELLY!
-      expect(s.model(), allOf(contains("x -> 3"), contains("y -> 4")));
+        ///SMELLY!
+        expect(s.model(), allOf(contains("x -> 3"), contains("y -> 4")));
 
-      s.delSolver();
-      ast.delAst();
-    }));
+        s.delSolver();
+        ast.delAst();
+      }));
+    });
   });
 }
