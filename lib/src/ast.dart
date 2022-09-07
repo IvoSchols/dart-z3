@@ -5,6 +5,7 @@ class AST {
   final NativeZ3Library _native;
   late final Z3_context _context;
 
+  late final Z3_sort _stringSort;
   late final Z3_sort _boolSort;
   late final Z3_sort _intSort;
 
@@ -15,6 +16,7 @@ class AST {
     _native.Z3_del_config(config);
 
     //is this okay? Maybe create sorts/types class?
+    _stringSort = _native.Z3_mk_string_sort(_context);
     _boolSort = _native.Z3_mk_bool_sort(context);
     _intSort = _native.Z3_mk_int_sort(context);
   }
@@ -109,8 +111,18 @@ class AST {
   /// Make variables
   ///
 
+  /// Create a string constant
+  Z3_ast mkStringConst(String str) {
+    return _native.Z3_mk_string(context, str.toNativeUtf8().cast());
+  }
+
+  /// Create a string variable using the given name
+  Z3_ast mkStringVar(String name) {
+    return _mkVar(name, _stringSort);
+  }
+
   ///  Create a constant symbol using the given name.
-  Z3_ast mkVar(String name, Z3_sort ty) {
+  Z3_ast _mkVar(String name, Z3_sort ty) {
     Z3_symbol s =
         _native.Z3_mk_string_symbol(_context, name.toNativeUtf8().cast());
 
@@ -125,7 +137,7 @@ class AST {
 
   /// Create a boolean variable using the given name
   Z3_ast mkBoolVar(String name) {
-    return mkVar(name, _boolSort);
+    return _mkVar(name, _boolSort);
   }
 
   /// Create an integer
@@ -135,7 +147,7 @@ class AST {
 
   /// Create an integer variable using the given name
   Z3_ast mkIntVar(String name) {
-    return mkVar(name, _intSort);
+    return _mkVar(name, _intSort);
   }
 
   Z3_context get context => _context;

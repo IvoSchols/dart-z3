@@ -1,6 +1,6 @@
 name: dart_z3
 description: Holds Dart-like bindings for the C api of Z3 Theorem Prover, version (4.8.17).
-version: 1.0.3
+version: 1.0.4
 repository: https://github.com/IvoSchols/dart-z3
 
 environment:

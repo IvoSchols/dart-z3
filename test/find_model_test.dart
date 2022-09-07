@@ -90,5 +90,23 @@ void main() {
         ast.delAst();
       }));
     });
+
+    group('find string', () {
+      setUp(() {
+        s = Solver(z3.native, ast.context);
+      });
+
+      test('expect string value foo bar', () {
+        var x = ast.mkStringVar("x");
+        var y = ast.mkStringConst("foo bar");
+
+        var c1 = ast.eq(x, y);
+
+        s.add(c1);
+
+        expect(s.check(), "true");
+        expect(s.model(), contains('x -> "foo bar"'));
+      });
+    });
   });
 }
