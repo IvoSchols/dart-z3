@@ -98,6 +98,20 @@ class AST {
     return _native.Z3_mk_lt(context, x, y);
   }
 
+  /// Create an AST node representing ge
+  /// x and y must have the same sort, and must be int or real sort
+  Z3_ast ge(Z3_ast x, Z3_ast y) {
+    if (!_areIntOrRealSort([x, y])) throw ElementNotIntOrRealSortException();
+    return _native.Z3_mk_ge(context, x, y);
+  }
+
+  /// Create an AST node representing le
+  /// x and y must have the same sort, and must be int or real sort
+  Z3_ast le(Z3_ast x, Z3_ast y) {
+    if (!_areIntOrRealSort([x, y])) throw ElementNotIntOrRealSortException();
+    return _native.Z3_mk_le(context, x, y);
+  }
+
   /// Create an AST node representing mul
   /// All types must be of type int or real sort
   /// args must have at least one element
