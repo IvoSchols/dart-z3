@@ -39,6 +39,13 @@ class AST {
     return _native.Z3_mk_eq(context, l, r);
   }
 
+  // Create an AST node representing l != r
+  /// l and r must be of the same sort
+  Z3_ast neq(Z3_ast l, Z3_ast r) {
+    if (!_isSameSort(l, r)) throw SortMismatchException();
+    return _native.Z3_mk_not(context, eq(l, r));
+  }
+
   /// Create an AST node representing xor
   /// x and y must be of type bool sort
   Z3_ast iff(Z3_ast x, Z3_ast y) {
