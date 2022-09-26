@@ -3,17 +3,18 @@ import 'package:dart_z3/dart_z3.dart';
 import 'package:dart_z3/src/generated_bindings.dart';
 
 /// SMELLY TESTS, ADD EXCEPTIONS UPON FAILURE
+/// PLEASE NOTE THE IMPORTANCE OF s.reset()
 void main() {
   group('condition', () {
-    Z3 z3;
-    late AST ast;
-    late Solver s;
+    Z3 z3 = Z3();
+    late AST ast = AST(z3.native);
+    late Solver s = Solver(z3.native, ast.context);
 
-    setUp(() {
-      z3 = Z3();
-      ast = AST(z3.native);
-      s = Solver(z3.native, ast.context);
-    });
+    // setUp(() {
+    //   z3 = Z3();
+    //   ast = AST(z3.native);
+    //   s = Solver(z3.native, ast.context);
+    // });
     test('equalsZero', () {
       Z3_ast val = ast.mkIntVar('x');
       Z3_ast zero = ast.mkInt(0);
@@ -21,6 +22,7 @@ void main() {
       s.add(equals);
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> 0"));
+      s.reset();
     });
 
     test('greaterEqualsThree', () {
@@ -37,6 +39,8 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> 3"));
+
+      s.reset();
     });
 
     test('lessEqualMinusTwelve', () {
@@ -60,6 +64,8 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 12)"));
+
+      s.reset();
     });
 
     test('greaterThanMinusEight', () {
@@ -92,6 +98,8 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 4)"));
+
+      s.reset();
     });
 
     test('lessThenMinusEight', () {
@@ -130,6 +138,8 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 11)"));
+
+      s.reset();
     });
 
     test('equalsMinusEight', () {
@@ -168,6 +178,8 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 8)"));
+
+      s.reset();
     });
   });
 }

@@ -62,9 +62,4 @@ class Solver {
   }
 
   Z3_solver get solver => _solver;
-
-  //NOT SURE ABOUT THIS
-  void delSolver() {
-    _native.Z3_solver_dec_ref(_context, _solver);
-  }
 }
