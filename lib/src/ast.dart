@@ -206,8 +206,11 @@ class AST {
   }
 
   /// Check if all given AST are of same sort
-  bool _areSameSort(List<Z3_ast> args) {
-    return args.every((ast) => _isSameSort(args[0], ast));
+  /// (Not sure if the responsibility lies with this package)
+  bool areSameSort(List<Z3_ast> args) {
+    if (args.isEmpty) return false;
+    if (args.length == 1) return true;
+    return args.skip(1).every((element) => _isSameSort(args[0], element));
   }
 
   /// Check if given AST is of type int sort

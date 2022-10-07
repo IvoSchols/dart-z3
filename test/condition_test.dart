@@ -15,6 +15,11 @@ void main() {
     //   ast = AST(z3.native);
     //   s = Solver(z3.native, ast.context);
     // });
+
+    tearDown((() {
+      s.reset();
+    }));
+
     test('equalsZero', () {
       Z3_ast val = ast.mkIntVar('x');
       Z3_ast zero = ast.mkInt(0);
@@ -22,7 +27,6 @@ void main() {
       s.add(equals);
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> 0"));
-      s.reset();
     });
 
     test('greaterEqualsThree', () {
@@ -39,8 +43,6 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> 3"));
-
-      s.reset();
     });
 
     test('lessEqualMinusTwelve', () {
@@ -64,8 +66,6 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 12)"));
-
-      s.reset();
     });
 
     test('greaterThanMinusEight', () {
@@ -98,8 +98,6 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 4)"));
-
-      s.reset();
     });
 
     test('lessThenMinusEight', () {
@@ -138,8 +136,6 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 11)"));
-
-      s.reset();
     });
 
     test('equalsMinusEight', () {
@@ -178,8 +174,22 @@ void main() {
 
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> (- 8)"));
+    });
 
-      s.reset();
+    test('equalsTrue', () {
+      Z3_ast val = ast.mkBoolVar('x');
+      s.add(val);
+
+      expect(s.check(), contains("true"));
+      expect(s.model(), contains("x -> true"));
+    });
+
+    test('equalsFalse', () {
+      Z3_ast val = ast.mkBoolVar('x');
+      s.add(ast.not(val));
+
+      expect(s.check(), contains("true"));
+      expect(s.model(), contains("x -> false"));
     });
   });
 }
