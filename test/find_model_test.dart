@@ -37,7 +37,6 @@ void main() {
           anyOf(allOf(contains("x -> true"), contains("y -> false")),
               allOf(contains("x -> false"), contains("y -> true"))));
 
-      s.delSolver();
       ast.delAst();
     }));
 
@@ -86,7 +85,6 @@ void main() {
         ///SMELLY!
         expect(s.model(), allOf(contains("x -> 3"), contains("y -> 4")));
 
-        s.delSolver();
         ast.delAst();
       }));
     });
