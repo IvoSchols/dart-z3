@@ -1,6 +1,7 @@
 part of 'z3.dart';
 
 /// An abstract syntax tree (AST) node that holds its own context.
+/// ALL RETURNS NEED TO BE FREED -> MEMORY LEAKS
 class AST {
   final NativeZ3Library _native;
   late final Z3_context _context;
@@ -19,6 +20,12 @@ class AST {
     _stringSort = _native.Z3_mk_string_sort(_context);
     _boolSort = _native.Z3_mk_bool_sort(context);
     _intSort = _native.Z3_mk_int_sort(context);
+  }
+
+  // Destructor, frees the context
+  void dispose() {
+    _native.Z3_del_context(_context);
+    malloc.free(_context);
   }
 
   // Propositional Logic and Equality
@@ -134,7 +141,10 @@ class AST {
 
   /// Create a string constant
   Z3_ast mkStringConst(String str) {
-    return _native.Z3_mk_string(context, str.toNativeUtf8().cast());
+    Pointer<Char> strPtr = str.toNativeUtf8().cast();
+    Z3_ast result = _native.Z3_mk_string(context, strPtr);
+    malloc.free(strPtr);
+    return result;
   }
 
   /// Create a string variable using the given name
@@ -144,16 +154,20 @@ class AST {
 
   ///  Create a constant symbol using the given name.
   Z3_ast _mkVar(String name, Z3_sort ty) {
-    Z3_symbol s =
-        _native.Z3_mk_string_symbol(_context, name.toNativeUtf8().cast());
-
-    return _native.Z3_mk_const(_context, s, ty);
+    Pointer<Char> strPtr = name.toNativeUtf8().cast();
+    Z3_symbol s = _native.Z3_mk_string_symbol(_context, strPtr);
+    Z3_ast result = _native.Z3_mk_const(_context, s, ty);
+    malloc.free(strPtr);
+    // malloc.free(s); -> cannot free segfault
+    return result;
   }
 
   /// Create a boolean constant
   Z3_ast mkBoolConst(bool boolean) {
-    var symbol = _native.Z3_mk_int_symbol(context, boolean ? 1 : 0);
-    return _native.Z3_mk_const(_context, symbol, _boolSort);
+    Z3_symbol symbol = _native.Z3_mk_int_symbol(context, boolean ? 1 : 0);
+    Z3_ast result = _native.Z3_mk_const(context, symbol, _boolSort);
+    // malloc.free(symbol); -> cannot free attempt to free invalid pointer 0x1
+    return result;
   }
 
   /// Create a boolean variable using the given name

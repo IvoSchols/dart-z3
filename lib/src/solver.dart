@@ -50,8 +50,13 @@ class Solver {
       Pointer<Char> charPointer = _native.Z3_model_to_string(_context, m);
       Pointer<Utf8> utfPointer = charPointer.cast();
       result += utfPointer.toDartString();
+      // malloc.free(utfPointer); -> segfault
+      // malloc.free(charPointer); -> segfault
     }
     if (m != Pointer.fromAddress(0)) _native.Z3_model_dec_ref(_context, m);
+
+    //free memory
+    // malloc.free(m); -> segfault
 
     return result;
   }
