@@ -6,15 +6,15 @@ import 'package:dart_z3/src/generated_bindings.dart';
 /// PLEASE NOTE THE IMPORTANCE OF s.reset()
 void main() {
   group('condition', () {
-    Z3 z3 = Z3();
-    late AST ast = AST(z3.native);
-    late Solver s = Solver(z3.native, ast.context);
+    Z3 z3;
+    late AST ast;
+    late Solver s;
 
-    // setUp(() {
-    //   z3 = Z3();
-    //   ast = AST(z3.native);
-    //   s = Solver(z3.native, ast.context);
-    // });
+    setUp(() {
+      z3 = Z3();
+      ast = AST(z3.native);
+      s = Solver(z3.native, ast.context);
+    });
 
     tearDown((() {
       s.reset();
@@ -191,5 +191,7 @@ void main() {
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> false"));
     });
+
+    ast.dispose();
   });
 }

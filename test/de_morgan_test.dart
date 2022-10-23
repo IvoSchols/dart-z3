@@ -3,9 +3,10 @@ import 'package:test/test.dart';
 
 void main() {
   group('deMorgan', () {
-    Z3 z3;
-    AST ast;
+    late Z3 z3;
+    late AST ast;
     late Solver s;
+
     setUp(() {
       z3 = Z3();
       ast = AST(z3.native);
@@ -27,6 +28,10 @@ void main() {
       var negatedConjecture = ast.not(conjecture);
       s = Solver(native, context);
       s.add(negatedConjecture);
+    });
+
+    tearDown(() {
+      ast.dispose();
     });
 
     test('check expect unsat', (() {

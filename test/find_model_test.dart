@@ -8,9 +8,14 @@ void main() {
     late Z3 z3;
     late AST ast;
     late Solver s;
+
     setUp(() {
       z3 = Z3();
       ast = AST(z3.native);
+    });
+
+    tearDown(() {
+      ast.dispose();
     });
 
     test('x xor y expect true', (() {
@@ -63,6 +68,10 @@ void main() {
         s.add(c2);
       });
 
+      tearDown(() {
+        ast.dispose();
+      });
+
       test(' x < y + 1, x > 2 expect x=3 y=3', (() {
         ///model for: x < y + 1, x > 2"
         expect(s.check(), "true");
@@ -92,6 +101,10 @@ void main() {
     group('find string', () {
       setUp(() {
         s = Solver(z3.native, ast.context);
+      });
+
+      tearDown(() {
+        ast.dispose();
       });
 
       test('expect string value foo bar', () {

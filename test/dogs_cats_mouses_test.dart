@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group('dogs cats mouses', () {
     Z3 z3;
-    AST ast;
+    late AST ast;
     late Solver s;
 
     setUp(() {
@@ -37,6 +37,10 @@ void main() {
       var tenThousand = ast.mkInt(10000);
       var c5 = ast.eq(costDogCatMouse, tenThousand);
       s.add(c5);
+    });
+
+    tearDown(() {
+      ast.dispose();
     });
 
     test('check expect sat', (() {

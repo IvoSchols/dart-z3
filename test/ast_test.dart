@@ -16,6 +16,10 @@ void main() {
       s = Solver(z3.native, ast.context);
     });
 
+    tearDown(() {
+      ast.dispose();
+    });
+
     test('expect and throws empty', (() {
       expect(() => ast.and([]), throwsA(isA<Exception>()));
     }));

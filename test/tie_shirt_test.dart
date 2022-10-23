@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group('tie shirt', () {
     Z3 z3;
-    AST ast;
+    late AST ast;
     late Solver s;
 
     setUp(() {
@@ -31,6 +31,10 @@ void main() {
       s.add(xOrY);
       s.add(nxOrY);
       s.add(nxOrNy);
+    });
+
+    tearDown(() {
+      ast.dispose();
     });
 
     test('check expect sat', (() {
