@@ -18,6 +18,7 @@ void main() {
 
     tearDown((() {
       s.reset();
+      ast.dispose();
     }));
 
     test('equalsZero', () {
@@ -191,7 +192,5 @@ void main() {
       expect(s.check(), contains("true"));
       expect(s.model(), contains("x -> false"));
     });
-
-    ast.dispose();
   });
 }

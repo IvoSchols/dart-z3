@@ -24,8 +24,8 @@ class AST {
 
   // Destructor, frees the context
   void dispose() {
-    _native.Z3_del_context(_context);
-    malloc.free(_context);
+    // _native.Z3_del_context(_context);
+    // calloc.free(_context);
   }
 
   // Propositional Logic and Equality
@@ -36,7 +36,10 @@ class AST {
   Z3_ast and(List<Z3_ast> args) {
     if (args.isEmpty) throw EmptyListException();
     if (!_areBoolSort(args)) throw ElementNotBoolSortException();
-    return _native.Z3_mk_and(context, args.length, _astListToArray(args));
+    Pointer<Z3_ast> cArray = _astListToCArray(args);
+    Z3_ast result = _native.Z3_mk_and(context, args.length, cArray);
+    calloc.free(cArray);
+    return result;
   }
 
   /// Create an AST node representing l = r
@@ -74,8 +77,10 @@ class AST {
   Z3_ast or(List<Z3_ast> args) {
     if (args.isEmpty) throw EmptyListException();
     if (!_areBoolSort(args)) throw ElementNotBoolSortException();
-
-    return _native.Z3_mk_or(context, args.length, _astListToArray(args));
+    Pointer<Z3_ast> cArray = _astListToCArray(args);
+    Z3_ast result = _native.Z3_mk_or(context, args.length, cArray);
+    calloc.free(cArray);
+    return result;
   }
 
   /// Create an AST node representing xor
@@ -93,7 +98,10 @@ class AST {
   Z3_ast add(List<Z3_ast> args) {
     if (args.isEmpty) throw EmptyListException();
     if (!_areIntOrRealSort(args)) throw ElementNotIntOrRealSortException();
-    return _native.Z3_mk_add(context, args.length, _astListToArray(args));
+    Pointer<Z3_ast> cArray = _astListToCArray(args);
+    Z3_ast result = _native.Z3_mk_add(context, args.length, cArray);
+    calloc.free(cArray);
+    return result;
   }
 
   /// Create an AST node representing gt
@@ -132,7 +140,10 @@ class AST {
   Z3_ast mul(List<Z3_ast> args) {
     if (args.isEmpty) throw EmptyListException();
     if (!_areIntOrRealSort(args)) throw ElementNotIntOrRealSortException();
-    return _native.Z3_mk_mul(context, args.length, _astListToArray(args));
+    Pointer<Z3_ast> cArray = _astListToCArray(args);
+    Z3_ast result = _native.Z3_mk_mul(context, args.length, cArray);
+    calloc.free(cArray);
+    return result;
   }
 
   ///
@@ -191,7 +202,7 @@ class AST {
   /// Helper function
   ///
   ///
-  Pointer<Z3_ast> _astListToArray(List<Z3_ast> list) {
+  Pointer<Z3_ast> _astListToCArray(List<Z3_ast> list) {
     final ptr = calloc.allocate<Z3_ast>(sizeOf<Pointer>() * list.length);
     for (var i = 0; i < list.length; i++) {
       ptr.elementAt(i).value = list[i];
